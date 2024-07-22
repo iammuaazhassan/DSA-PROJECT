@@ -1,0 +1,638 @@
+#ifndef TASK_H
+#define TASK_H
+
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class Task
+{
+
+    public:
+        string taskname ;
+        string date ;
+        int priority;
+
+        string get_taskname();
+        void set_taskname(string);
+        string get_date();
+        void set_date(string);
+        int get_priority();
+        void set_priority(int);
+
+        void display_task_name();
+        void display();
+
+        Task();
+        virtual ~Task();
+
+
+
+};
+
+#endif // TASK_H
+
+#include "Task.h"
+#include <string>
+
+Task ::Task()
+{
+    taskname = "----" ;
+    date = "dd-mm-yyyy" ;
+    priority = 0 ;
+    //ctor
+}
+
+Task ::~Task()
+{
+    //dtor
+}
+
+string Task :: get_taskname()
+{
+    string NAME ;
+    cout << "\nEnter the TASK NAME : " ;
+    cin.ignore();
+    getline(cin , NAME);
+    return NAME ;
+}
+
+void Task :: set_taskname(string NAME)
+{
+    taskname = NAME ;
+}
+
+string Task :: get_date()
+{
+    string DATE ;
+    cout << "Enter the DUE DATE : " ;
+    cin.ignore();
+    getline(cin , DATE);
+    return DATE ;
+}
+
+void Task :: set_date(string DATE)
+{
+    date = DATE ;
+}
+
+int Task :: get_priority()
+{
+    int PRIORITY ;
+    cout << "Enter the PRIORITY : " ;
+    cin >> PRIORITY ;
+    return PRIORITY ;
+}
+
+void Task :: set_priority(int PRIORITY)
+{
+    priority = PRIORITY ;
+}
+
+void Task :: display_task_name()
+{
+    cout << "TASK: " << taskname << endl;
+}
+
+void Task :: display()
+{
+    cout << "\nTASK: " << taskname  ;
+    cout << "\nDATE: " << date ;
+    cout << "\nPRIORITY # " << priority ;
+    cout << endl ;
+}
+
+#ifndef TASKMANAGER_H
+#define TASKMANAGER_H
+
+#include "Task.h"
+#include <string>
+
+using namespace std;
+
+
+class TaskManager : public Task
+{
+
+    public:
+        Task task;
+
+        TaskManager* prev_task ;
+        TaskManager* next_task ;
+
+
+        TaskManager* HEAD = nullptr ;
+
+        void add_task();
+
+        void remove_task(const string&);
+
+        void update_task_priority(const string&,int);
+        void update_task_name(const string&,const string&);
+        void update_task_date(const string& ,const string& );
+
+        Task* find_task_by_name(const string& );
+        Task* find_task_by_priority(int );
+
+        bool isPriorityAvailable(int );
+
+        void display_task_names();
+        void display_task_details();
+
+
+
+
+
+        TaskManager();
+        virtual ~TaskManager();
+
+
+};
+
+#endif // TASKMANAGER_H
+
+#include "TaskManager.h"
+
+TaskManager::TaskManager()
+{
+    //ctor
+}
+
+TaskManager::~TaskManager()
+{
+    //dtor
+}
+
+void TaskManager :: add_task()
+{
+    TaskManager* newTask = new TaskManager ;
+
+    newTask->task.set_taskname(get_taskname()) ;
+    newTask->task.set_date(get_date()) ;
+    newTask->task.set_priority(get_priority()) ;
+    if(HEAD==nullptr)
+    {
+        HEAD = newTask ;
+        newTask->prev_task=nullptr;
+        newTask->next_task=nullptr;
+        cout << "\n === TASK ADDED SUCCESFULLY === " ;
+    }
+    else
+    {
+        TaskManager* Temp = HEAD ;
+        while(Temp->next_task!=nullptr)
+        {
+            Temp = Temp->next_task ;
+        }
+        Temp->next_task = newTask ;
+        newTask->prev_task=Temp;
+        newTask->next_task=nullptr;
+        cout << "\n === TASK ADDED SUCCESFULLY === " ;
+    }
+}
+
+void TaskManager::remove_task(const string& TaskName)
+{
+    TaskManager* temp = HEAD;
+    while (temp!=nullptr && temp->task.taskname!=TaskName)
+    {
+        temp = temp->next_task;
+    }
+    if (temp==nullptr)
+    {
+        cout << "Task with TaskName '" << TaskName << "' not found." << endl;
+        return;
+    }
+    if (temp->prev_task!=nullptr)
+    {
+        temp->prev_task->next_task = temp->next_task;
+    }
+    else
+    {
+        HEAD = temp->next_task;
+    }
+    if (temp->next_task!=nullptr)
+    {
+        temp->next_task->prev_task = temp->prev_task;
+    }
+    delete temp;
+    cout << "Task with TaskName '" << TaskName << "' removed successfully." << endl;
+}
+
+void TaskManager :: update_task_priority(const string& taskname, int newPriority)
+{
+    TaskManager* temp = HEAD;
+    while (temp!=nullptr && temp->task.taskname!=taskname)
+    {
+        temp = temp->next_task;
+    }
+
+    if (temp == nullptr)
+    {
+        cout << "Task with TaskName '" << taskname << "' not found." << endl;
+        return;
+    }
+
+    temp->task.set_priority(newPriority);
+
+    cout << "Task with TaskName '" << taskname << "' updated successfully." << endl;
+}
+
+void TaskManager::update_task_name(const string& currentTaskName, const string& newTaskName)
+{
+    TaskManager* temp = HEAD;
+    while (temp!=nullptr && temp->task.taskname!=currentTaskName)
+    {
+        temp = temp->next_task;
+    }
+
+    if (temp==nullptr)
+    {
+        cout << "Task with TaskName '" << currentTaskName << "' not found." << endl;
+        return;
+    }
+
+    temp->task.set_taskname(newTaskName);
+
+    cout << "Task with TaskName '" << currentTaskName << "' updated to '" << newTaskName << "' successfully." << endl;
+}
+
+void TaskManager::update_task_date(const string& taskName, const string& newDate)
+{
+    TaskManager* temp = HEAD;
+    while (temp != nullptr && temp->task.taskname != taskName)
+    {
+        temp = temp->next_task;
+    }
+
+    if (temp == nullptr)
+    {
+        cout << "Task with TaskName '" << taskName << "' not found." << endl;
+        return;
+    }
+
+    temp->task.set_date(newDate);
+
+    cout << "Due date for Task with TaskName '" << taskName << "' updated to '" << newDate << "' successfully." << endl;
+}
+
+
+Task* TaskManager :: find_task_by_name(const string& taskName)
+{
+    TaskManager* temp = HEAD;
+    while (temp!=nullptr && temp->task.taskname!=taskName)
+    {
+        temp = temp->next_task;
+    }
+
+    if (temp == nullptr)
+    {
+        cout << "Task with TaskName '" << taskName << "' not found." << endl;
+        return nullptr;
+    }
+
+    return &(temp->task);
+}
+
+Task* TaskManager :: find_task_by_priority(int priority)
+{
+    TaskManager* temp = HEAD;
+    while (temp!=nullptr && temp->task.priority!=priority)
+    {
+        temp = temp->next_task;
+    }
+
+    if (temp==nullptr)
+    {
+        cout << "Task with Priority '" << priority << "' not found." << endl;
+        return nullptr;
+    }
+
+    return &(temp->task);
+}
+
+
+void TaskManager :: display_task_names()
+{
+    TaskManager* temp = HEAD ;
+    while(temp!=nullptr)
+    {
+        temp->task.display_task_name() ;
+        temp = temp->next_task ;
+    }
+}
+
+bool TaskManager::isPriorityAvailable(int priority)
+{
+    TaskManager* temp = HEAD;
+    while (temp != nullptr)
+    {
+        if (temp->task.priority == priority)
+        {
+            return false;
+        }
+        temp = temp->next_task;
+    }
+    return true;
+}
+
+
+void TaskManager :: display_task_details()
+{
+    TaskManager* temp = HEAD ;
+    while(temp!=nullptr)
+    {
+        temp->task.display() ;
+        temp = temp->next_task ;
+    }
+}
+
+#ifndef TASKPRIORITYQUEUE_H
+#define TASKPRIORITYQUEUE_H
+
+#include "TaskManager.h"
+
+    struct Node
+    {
+        Task* task;
+        Node* next;
+        Node(Task* t) : task(t), next(nullptr) {}
+    };
+class TaskPriorityQueue {
+private:
+
+    Node* front;
+
+public:
+    TaskPriorityQueue();
+    ~TaskPriorityQueue();
+
+    void enqueue(TaskManager* taskManager);
+    Task* dequeue();
+    bool isEmpty();
+    void displayPriorityQueue();
+};
+#endif // TASKPRIORITYQUEUE_H
+
+#include "TaskPriorityQueue.h"
+#include <iostream>
+using namespace std;
+
+TaskPriorityQueue::TaskPriorityQueue()
+{
+    front = nullptr ;
+}
+
+TaskPriorityQueue::~TaskPriorityQueue()
+{
+    while (!isEmpty()) {
+        dequeue();
+    }
+}
+
+void TaskPriorityQueue::enqueue(TaskManager* taskManager)
+{
+    Task* task = &(taskManager->task);
+
+    if (!taskManager->isPriorityAvailable(task->get_priority()))
+    {
+        cout << "Priority " << task->get_priority() << " is not available. Choose another priority." << endl;
+        return;
+    }
+
+    Node* newNode = new Node(task);
+
+    if (isEmpty() || !taskManager->isPriorityAvailable(front->task->get_priority()))
+    {
+        newNode->next = front;
+        front = newNode;
+    }
+    else
+    {
+        Node* current = front;
+        while (current->next != nullptr && !taskManager->isPriorityAvailable(current->next->task->get_priority()))
+        {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+}
+
+
+
+Task* TaskPriorityQueue :: dequeue() {
+    if (isEmpty()) {
+       cout << "Priority queue is empty." <<endl;
+        return nullptr;
+    }
+
+    Task* task = front->task;
+    Node* temp = front;
+    front = front->next;
+    delete temp;
+    return task;
+}
+
+bool TaskPriorityQueue::isEmpty() {
+    return front == nullptr;
+}
+
+void TaskPriorityQueue::displayPriorityQueue() {
+    Node* current = front;
+    while (current != nullptr) {
+        current->task->display();
+        current = current->next;
+    }
+}
+
+#include <iostream>
+#include "TaskManager.h"
+#include "TaskPriorityQueue.h"
+
+using namespace std;
+
+int main()
+{
+
+    TaskManager taskManager;
+    TaskPriorityQueue priorityQueue;
+
+    Task* task1 = new Task();
+    task1->set_taskname("ASSINGMENTS OF DSA");
+    task1->set_date("2024-01-23");
+    task1->set_priority(3);
+    taskManager.HEAD = new TaskManager();
+    taskManager.HEAD->task = *task1;
+
+    Task* task2 = new Task();
+    task2->set_taskname("DSA FINAL PROJECT");
+    task2->set_date("2024-01-17");
+    task2->set_priority(1);
+    TaskManager* newTask2 = new TaskManager();
+    newTask2->task = *task2;
+    newTask2->prev_task = taskManager.HEAD;
+    taskManager.HEAD->next_task = newTask2;
+
+    Task* task3 = new Task();
+    task3->set_taskname("DSA LAB FINAL");
+    task3->set_date("2024-01-19");
+    task3->set_priority(2);
+    TaskManager* newTask3 = new TaskManager();
+    newTask3->task = *task3;
+    newTask3->prev_task = newTask2;
+    newTask2->next_task = newTask3;
+
+    int choice = 0 ;
+    do
+    {
+        cout << "\n ======================================================" ;
+        cout << "\n|                    ----------                       |" ;
+        cout << "\n|                       MENU                          |" ;
+        cout << "\n|                    ----------                       |" ;
+        cout << "\n|\t CHOOSE 1 TO ADD TASK                         |" ;
+        cout << "\n|\t CHOOSE 2 TO REMOVE TASK                      |" ;
+        cout << "\n|\t CHOOSE 3 TO UPDATE TASK                      |" ;
+        cout << "\n|\t CHOOSE 4 TO FIND TASK                        |" ;
+        cout << "\n|\t CHOOSE 5 TO DISPLAY TASK LIST                |" ;
+        cout << "\n|\t CHOOSE 6 TO DISPLAY PRIORITY QUEUE           |" ;
+        cout << "\n|\t CHOOSE 7 TO ENQUEUE TASK INTO PRIORITY QUEUE |";
+        cout << "\n|\t CHOOSE 8 TO DEQUEUE TASK FROM PRIORITY QUEUE |";
+        cout << "\n|\t                                              |" ;
+        cout << "\n|\t CHOOSE 0 TO EXIT MENU                        |" ;
+        cout << "\n|\t                                              |" ;
+        cout << "\n ======================================================" ;
+
+        cout << "\n ENTER YOUR CHOICE : " ;
+        cin >> choice ;
+
+        if(choice==1)
+        {
+            taskManager.add_task();
+        }
+        else if(choice==2)
+        {
+            string task_to_remove ;
+            cout << "\n\tEnter the TASK NAME to remove : " ;
+            cin >> task_to_remove ;
+            taskManager.remove_task(task_to_remove);
+        }
+        else if(choice==3)
+        {
+            cout << "\n\t=============================================" ;
+            cout << "\n\t|\t CHOOSE 1 TO UPDATE TASK NAME       |" ;
+            cout << "\n\t|\t CHOOSE 2 TO UPDATE TASK PRIORITY   |" ;
+            cout << "\n\t=============================================" ;
+            cout << "\n\t ENTER YOUR CHOICE : " ;
+            cin >> choice ;
+            if(choice==1)
+            {
+                string currentName, newName;
+                cout << "\n\tEnter the CURRENT TASK NAME: ";
+                cin >> currentName;
+                cout << "\n\tEnter the NEW TASK NAME: ";
+                cin >> newName;
+                taskManager.update_task_name(currentName, newName);
+            }
+            else if(choice==2)
+            {
+                string taskName;
+                int newPriority;
+                cout << "Enter the TASK NAME: ";
+                cin >> taskName;
+                cout << "Enter the new PRIORITY: ";
+                cin >> newPriority;
+                taskManager.update_task_priority(taskName, newPriority);
+            }
+            else
+            {
+                cout << "\n\n\t\t===INVAILD CHOICE===" ;
+            }
+        }
+        else if(choice==4)
+        {
+            cout << "\n\t=============================================" ;
+            cout << "\n\t|\t CHOOSE 1 TO FIND TASK BY NAME      |" ;
+            cout << "\n\t|\t CHOOSE 2 TO FIND TASK BY PRIORITY  |" ;
+            cout << "\n\t=============================================" ;
+            cout << "\n\t ENTER YOUR CHOICE : " ;
+            cin >> choice ;
+
+            if(choice==1)
+            {
+                string taskName;
+                cout << "Enter the TASK NAME TO FIND: ";
+                cin >> taskName;
+                Task* foundTask = taskManager.find_task_by_name(taskName);
+                if (foundTask != nullptr)
+                {
+                    cout << "=== TASK FOUND === \n\t\t ";
+                    foundTask->display();
+                }
+            }
+            else if(choice==2)
+            {
+                int priority;
+                cout << "Enter the TASK PRIORITY TO FIND: ";
+                cin >> priority;
+                Task* foundTask = taskManager.find_task_by_priority(priority);
+                if (foundTask != nullptr) {
+                    cout << "=== TASK FOUND === \n\t\t ";
+                    foundTask->display();
+                }
+            }
+            else
+            {
+                cout << "\n\n\t\t===INVAILD CHOICE===" ;
+            }
+        }
+        else if(choice==5)
+        {
+            cout << "\n\t================================================" ;
+            cout << "\n\t|\t CHOOSE 1 TO DISPLAY TASK NAME         |" ;
+            cout << "\n\t|\t CHOOSE 2 TO DISPLAY TASK DETAILS      |" ;
+            cout << "\n\t================================================" ;
+            cout << "\n\t ENTER YOUR CHOICE : " ;
+            cin >> choice ;
+
+            if(choice==1)
+            {
+                taskManager.display_task_names();
+            }
+            else if(choice==2)
+            {
+                taskManager.display_task_details();
+            }
+            else
+            {
+                cout << "\n\n\t\t===INVAILD CHOICE===" ;
+            }
+        }
+        else if(choice==6)
+        {
+            priorityQueue.displayPriorityQueue();
+        }
+        else if (choice == 7)
+        {
+            priorityQueue.enqueue(&taskManager);
+            cout << "Task enqueued into the priority queue." << endl;
+        }
+        else if (choice == 8)
+        {
+            Task* dequeuedTask = priorityQueue.dequeue();
+            if (dequeuedTask != nullptr)
+            {
+                cout << "Task dequeued from the priority queue:" << endl;
+                dequeuedTask->display();
+            }
+        }
+        else if (choice == 9)
+        {
+            priorityQueue.displayPriorityQueue();
+        }
+    }
+    while(choice!=0);
+
+
+}
